@@ -7,29 +7,36 @@ class Intersection;
 
 class Road {
 private:
+    int id;
     Intersection* start;
     Intersection* end;
     double distance;
     double speedLimit;
     double congestionLevel;
-    double travelCost;          
+    bool blocked; // accident status
 
 public:
-    Road(Intersection* start, Intersection* end, 
+    Road(int id, Intersection* start, Intersection* end, 
          double distance, 
-         double speedLimit = 60.0, 
+         double speedLimit, 
          double congestionLevel = 1.0);
 
+    //getters
+    int getId() const;
     Intersection* getStart() const;
     Intersection* getEnd() const;
     double getDistance() const;
     double getSpeedLimit() const;
     double getCongestionLevel() const;
-    double getTravelCost() const;
+    bool isBlocked() const;
 
+    double getTravelCost() const;
     double getTravelTime() const;        
-    void updateCongestion(double level);
-    void updateTravelCost(double cost);  
+    
+    void updateCongestionLevel(double newLevel);
+    void blockRoad();
+    void unblockRoad();
+
 
     std::string toString() const;
 
