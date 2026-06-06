@@ -9,22 +9,35 @@ Graph::~Graph() {
 
 // --- Utility ---
 void Graph::clearGraph() {
-    for (auto& pair : roads) {
-        delete pair.second;
+    // Remove all roads via removeRoad() so intersections are updated safely
+    std::vector<int> roadIds;
+    roadIds.reserve(roads.size());
+    for (auto &p : roads) {
+        roadIds.push_back(p.first);
     }
-    roads.clear();
+    for (int id : roadIds) {
+        removeRoad(id);
+    }
 
-    for (auto& pair : intersections) {
-        delete pair.second;
+    // Now delete all intersections
+    for (auto &p : intersections) {
+        delete p.second;
     }
     intersections.clear();
 }
 
 // --- Intersection Operations ---
 void Graph::addIntersection(Intersection* intersection) {
-    if (intersection != nullptr) {
-        intersections[intersection->getId()] = intersection;
+    if (intersection == nullptr) return;
+
+    int id = intersection->getId();
+    auto it = intersections.find(id);
+    if (it != intersections.end()) {
+        delete intersection;
+        return;
     }
+
+    intersections[id] = intersection;
 }
 
 void Graph::removeIntersection(int id) {
@@ -57,7 +70,7 @@ Intersection* Graph::getIntersection(int id) const {
     if (it != intersections.end()) {
         return it->second;
     }
-    return nullptr; // Temporarily return nullptr so the code compiles
+    return nullptr;
 }
 
 // --- Road Operations ---
@@ -67,16 +80,35 @@ void Graph::addRoad(Road* road) {
         Intersection* start = road->getStart();
         Intersection* end = road->getEnd();
         
-        if (start != nullptr && end != nullptr) {
- // Add road to the roads map
-            roads[road->getId()] = road;
-            
- // Update the intersections with incoming and outgoing roads
-            start->addOutgoingRoad(road);
-            end->addIncomingRoad(road);
+        if (start == nullptr || end == nullptr) {
+            delete road;
+            return;
         }
+
+        int id = road->getId();
+        if (roads.find(id) != roads.end()) {
+            delete road;
+            return;
+        }
+
+        // Ensure the referenced intersections belong to this graph (by id)
+        auto sit = intersections.find(start->getId());
+        auto eit = intersections.find(end->getId());
+        if (sit == intersections.end() || eit == intersections.end()) {
+            // One of the endpoints is not in this graph; reject the road
+            delete road;
+            return;
+        }
+
+        // Add road to the roads map
+        roads[id] = road;
+
+        // Update the intersections with incoming and outgoing roads using the stored intersection objects
+        sit->second->addOutgoingRoad(road);
+        eit->second->addIncomingRoad(road);
     }
-}
+    }
+
 
 void Graph::removeRoad(int id) {
     auto it = roads.find(id);
@@ -104,7 +136,21 @@ Road* Graph::getRoad(int id) const {
     if (it != roads.end()) {
         return it->second;
     }
-    return nullptr; // Temporarily return nullptr so the code compiles
+    return nullptr;
+}
+
+std::vector<Intersection*> Graph::getAllIntersections() const {
+    std::vector<Intersection*> result;
+    result.reserve(intersections.size());
+    for (const auto &p : intersections) result.push_back(p.second);
+    return result;
+}
+
+std::vector<Road*> Graph::getAllRoads() const {
+    std::vector<Road*> result;
+    result.reserve(roads.size());
+    for (const auto &p : roads) result.push_back(p.second);
+    return result;
 }
 
 // --- Graph Functions ---

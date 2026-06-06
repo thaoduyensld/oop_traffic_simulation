@@ -29,6 +29,10 @@ public:
     void updateRoadCondition(int roadId, double congestionLevel, bool blocked);
     std::vector<Road*> getConnectedRoads(int intersectionId) const;
 
+    // Accessors for visualization/testing
+    std::vector<Intersection*> getAllIntersections() const;
+    std::vector<Road*> getAllRoads() const;
+
     // --- Utility ---
     void clearGraph();
 };
