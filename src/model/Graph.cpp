@@ -1,4 +1,6 @@
 #include "Graph.h"
+#include <cmath>
+#include <limits>
 
 Graph::Graph() {
 }
@@ -181,4 +183,30 @@ std::vector<Road*> Graph::getConnectedRoads(int intersectionId) const {
     }
     
     return connectedRoads;
+}
+
+std::vector<Road*> Graph::getNeighbors(int intersectionId) const {
+    std::vector<Road*> neighbors;
+    Intersection* intersection = getIntersection(intersectionId);
+    
+    if (intersection != nullptr) {
+// Get all outgoing roads (neighbors)
+        std::vector<Road*> outgoing = intersection->getOutgoingRoads();
+        neighbors.insert(neighbors.end(), outgoing.begin(), outgoing.end());
+    }
+
+    return neighbors;
+}
+
+double Graph::calculateDistance(int startId, int destId) const {
+    Intersection* start = getIntersection(startId);
+    Intersection* dest = getIntersection(destId);
+    
+    if (start == nullptr || dest == nullptr) {
+        return std::numeric_limits<double>::infinity();
+    }
+    
+    double dx = dest->getX() - start->getX();
+    double dy = dest->getY() - start->getY();
+    return std::sqrt(dx * dx + dy * dy);
 }

@@ -32,6 +32,9 @@ public:
     // Accessors for visualization/testing
     std::vector<Intersection*> getAllIntersections() const;
     std::vector<Road*> getAllRoads() const;
+    std::vector<Road*> getNeighbors(int intersectionId) const;
+
+    double calculateDistance(int startId, int destId) const; // for A* heuristic
 
     // --- Utility ---
     void clearGraph();
