@@ -13,7 +13,7 @@ protected:
     Intersection* spawnPoint; // The intersection where the vehicle starts its journey
     Intersection* destination; 
     Road* currentRoad;
-    double distanceTravelledOnRoad; 
+    double progressOnCurrentRoad; 
     std::vector<Road*> currentRoute;
     int currentRouteIndex;
     std::vector<Road*> travelHistory;
@@ -32,7 +32,11 @@ public:
     Intersection* getDestination() const { return destination; }
     double getBaseSpeed() const { return baseSpeed; }
     Road* getCurrentRoad() const { return currentRoad; }
-    bool hasReachedDestination() const;
+    bool hasReachedDestination() const {
+        return (currentRoad == nullptr
+            && !currentRoute.empty()
+            && currentRouteIndex >= (int)currentRoute.size());
+    }
     double getProgressRatio() const;
 
 
@@ -40,7 +44,7 @@ public:
     void setRoute(const std::vector<Road*>& route);
     void addTravelHistory(Road* road) { travelHistory.push_back(road); }
     const std::vector<Road*>& getTravelHistory() const { return travelHistory; }
-    
+
 };
 
 #endif

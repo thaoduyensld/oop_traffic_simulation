@@ -13,10 +13,7 @@ public:
     // [BẮT BUỘC] Override lại hàm ảo để thể hiện Đa hình
     double calculateCurrentSpeed() const override {
         if (currentRoad == nullptr) return 0.0;
-        
-        // Đặc quyền xe ưu tiên: Hú còi dẹp đường!
-        // Phớt lờ mọi giới hạn tốc độ (speedLimit) và bất chấp kẹt xe (congestionLevel).
-        // Luôn chạy đúng với tốc độ gốc tối đa.
+        if (currentRoad -> isBlocked()) return 0.0; 
         return baseSpeed; 
     }
 };
