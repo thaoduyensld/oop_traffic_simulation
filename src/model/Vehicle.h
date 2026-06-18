@@ -7,30 +7,36 @@ class Intersection;
 class Road;
 
 class Vehicle {
-private:
+protected:
     int id;
-    Intersection* currentPosition;
-    Intersection* destination;
-    std::vector<Road*> currentRoute;
     double movementSpeed;
+    Intersection* spawnPoint; // The intersection where the vehicle starts its journey
+    Intersection* destination; 
+    Road* currentRoad;
+    double progressOnCurrentRoad; // Represents how far along the current road the vehicle is (0.0 to 1.0)
+
+    std::vector<Road*> currentRoute;
+    int currentRouteIndex;
     std::vector<Road*> travelHistory;
 
 public:
-    Vehicle(int id, Intersection* start, Intersection* dest, double speed)
-        : id(id), currentPosition(start), destination(dest), movementSpeed(speed) {}
+    Vehicle(int id, double speed, Intersection* start, Intersection* dest);
+    
+    virtual ~Vehicle() = default;
+    virtual double calculateCurrentSpeed() const = 0;
+    void update(double dt);
 
     // Getters
     int getId() const { return id; }
-    Intersection* getCurrentPosition() const { return currentPosition; }
+    Intersection* getSpawnPoint() const { return spawnPoint; }
     Intersection* getDestination() const { return destination; }
     double getMovementSpeed() const { return movementSpeed; }
+    Road* getCurrentRoad() const { return currentRoad; }
+    bool hasReachedDestination() const;
 
     // Setters / Update methods (Cơ bản)
-    void setCurrentPosition(Intersection* pos) { currentPosition = pos; }
-    void setRoute(const std::vector<Road*>& route) { currentRoute = route; }
+    void setRoute(const std::vector<Road*>& route);
     void addTravelHistory(Road* road) { travelHistory.push_back(road); }
-
-    ~Vehicle() {}
 };
 
 #endif
