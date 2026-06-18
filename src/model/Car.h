@@ -14,7 +14,8 @@ public:
     // [BẮT BUỘC] Override lại hàm ảo để thể hiện Đa hình
     double calculateCurrentSpeed() const override {
         if (currentRoad == nullptr) return 0.0;
-        
+        if (currentRoad->isBlocked()) return 0.0;
+
         // 1. Tốc độ không được vượt quá giới hạn của con đường
         double maxAllowedSpeed = std::min(baseSpeed, currentRoad->getSpeedLimit());
         
