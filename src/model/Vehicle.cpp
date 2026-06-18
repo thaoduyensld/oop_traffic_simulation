@@ -8,7 +8,7 @@ Vehicle::Vehicle(int id, double speed, Intersection* start, Intersection* dest)
       spawnPoint(start),
       destination(dest),
       currentRoad(nullptr),
-      progressOnCurrentRoad(0.0),
+      distanceTravelledOnRoad(0.0),
       currentRouteIndex(0) 
 {
     // Xe vừa sinh ra chưa có lộ trình, đứng yên tại spawnPoint chờ Người 3 nạp route
@@ -17,7 +17,7 @@ Vehicle::Vehicle(int id, double speed, Intersection* start, Intersection* dest)
 void Vehicle::setRoute(const std::vector<Road*>& route) {
     currentRoute = route;
     currentRouteIndex = 0;
-    progressOnCurrentRoad = 0.0;
+    distanceTravelledOnRoad = 0.0;
     
     if (!currentRoute.empty()) {
         currentRoad = currentRoute[0]; // Bắt đầu lăn bánh lên con đường đầu tiên
@@ -31,6 +31,13 @@ bool Vehicle::hasReachedDestination() const {
     return (currentRoad == nullptr && currentRouteIndex >= currentRoute.size());
 }
 
+double Vehicle::getProgressRatio() const {
+    if (currentRoad == nullptr || currentRoad->getDistance() <= 0.0) {
+        return 0.0;
+    }
+    return distanceTravelledOnRoad / currentRoad->getDistance();
+}
+
 void Vehicle::update(double dt) {
     // 1. Kiểm tra an toàn: Tới đích rồi hoặc chưa có đường thì đứng im
     if (hasReachedDestination() || currentRoad == nullptr) {
@@ -42,17 +49,17 @@ void Vehicle::update(double dt) {
 
     // 3. Tính toán quãng đường đi được trong frame này (S = v * t)
     double distanceMoved = actualSpeed * dt;
-    progressOnCurrentRoad += distanceMoved;
+    distanceTravelledOnRoad += distanceMoved;
 
     // 4. Kiểm tra xem xe có đi hết con đường hiện tại chưa
     // Dùng while để xử lý lố qua nhiều đường nhỏ liên tiếp
-    while (currentRoad != nullptr && progressOnCurrentRoad >= currentRoad->getDistance()) {
+    while (currentRoad != nullptr && distanceTravelledOnRoad >= currentRoad->getDistance()) {
         
         // Lưu lịch sử đường vừa đi xong
         addTravelHistory(currentRoad);
 
         // Khấu trừ quãng đường vừa đi hết, giữ lại phần dư (chạy lố) sang đường tiếp theo
-        progressOnCurrentRoad -= currentRoad->getDistance();
+        distanceTravelledOnRoad -= currentRoad->getDistance();
         
         // Nhảy sang đường tiếp theo trong lộ trình
         currentRouteIndex++;
@@ -63,7 +70,7 @@ void Vehicle::update(double dt) {
         } else {
             // Đã đến đích (hết lộ trình)
             currentRoad = nullptr;
-            progressOnCurrentRoad = 0.0; // Reset thẳng về 0 để an toàn
+            distanceTravelledOnRoad = 0.0; // Reset thẳng về 0 để an toàn
             break;
         }
     }
