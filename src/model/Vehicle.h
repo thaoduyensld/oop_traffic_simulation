@@ -9,12 +9,11 @@ class Road;
 class Vehicle {
 protected:
     int id;
-    double movementSpeed;
+    double baseSpeed;
     Intersection* spawnPoint; // The intersection where the vehicle starts its journey
     Intersection* destination; 
     Road* currentRoad;
-    double progressOnCurrentRoad; // Represents how far along the current road the vehicle is (0.0 to 1.0)
-
+    double distanceTravelledOnRoad; 
     std::vector<Road*> currentRoute;
     int currentRouteIndex;
     std::vector<Road*> travelHistory;
@@ -30,7 +29,7 @@ public:
     int getId() const { return id; }
     Intersection* getSpawnPoint() const { return spawnPoint; }
     Intersection* getDestination() const { return destination; }
-    double getMovementSpeed() const { return movementSpeed; }
+    double getMovementSpeed() const { return baseSpeed; }
     Road* getCurrentRoad() const { return currentRoad; }
     bool hasReachedDestination() const;
 
