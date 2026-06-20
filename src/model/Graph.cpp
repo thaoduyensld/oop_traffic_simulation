@@ -12,7 +12,6 @@ Graph::~Graph() {
 Graph::Graph(Graph&& other) noexcept
     : intersections(std::move(other.intersections)),
       roads(std::move(other.roads)) {
-    // Tước quyền sở hữu của thằng cũ
     other.intersections.clear();
     other.roads.clear();
 }
